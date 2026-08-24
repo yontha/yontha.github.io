@@ -24,7 +24,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
-        // Sayfa yüklenmeden önce tema tercihini kontrol et (titreşimi önlemek için)
+        // Tema tercihi kontrolü
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
@@ -38,27 +38,31 @@
     <header class="w-full max-w-2xl mx-auto px-6 py-8 sm:py-10 flex justify-between items-center">
         <!-- Logo & Brand -->
         <a href="#" class="flex items-center space-x-2.5 group">
-            <!-- Logo Alanı (logo.png) -->
             <div class="w-8 h-8 rounded-lg overflow-hidden border border-gray-200 dark:border-zinc-800 transition-transform group-hover:scale-105 flex items-center justify-center bg-transparent">
                 <img src="logo.png" alt="yontha logo" class="w-full h-full object-contain">
             </div>
             <span class="text-xl font-bold tracking-tighter text-gray-900 dark:text-zinc-100">yontha.</span>
         </a>
 
-        <!-- Nav Links & Theme Toggle -->
-        <div class="flex items-center space-x-4 sm:space-x-6">
+        <!-- Nav Links, Lang Toggle & Theme Toggle -->
+        <div class="flex items-center space-x-3 sm:space-x-5">
             <nav class="hidden sm:flex space-x-6 text-sm font-medium text-gray-500 dark:text-zinc-400">
-                <a href="#about" class="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors">About</a>
-                <a href="#skills" class="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors">Skills</a>
-                <a href="#projects" class="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors">Projects</a>
-                <a href="#contact" class="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors">Contact</a>
+                <a href="#about" class="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors" data-i18n="nav_about">About</a>
+                <a href="#skills" class="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors" data-i18n="nav_skills">Skills</a>
+                <a href="#projects" class="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors" data-i18n="nav_projects">Projects</a>
+                <a href="#contact" class="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors" data-i18n="nav_contact">Contact</a>
             </nav>
+
+            <!-- Language Toggle Button -->
+            <button id="lang-toggle" aria-label="Toggle Language" class="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 text-xs font-semibold text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors uppercase">
+                EN
+            </button>
 
             <!-- Theme Toggle Button -->
             <button id="theme-toggle" aria-label="Toggle Theme" class="p-2 rounded-lg border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors">
-                <!-- Sun Icon (Light Mode) -->
+                <!-- Sun Icon -->
                 <svg class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                <!-- Moon Icon (Dark Mode) -->
+                <!-- Moon Icon -->
                 <svg class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
             </button>
         </div>
@@ -69,29 +73,29 @@
         
         <!-- Hero Section -->
         <section id="about" class="space-y-6">
-            <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-zinc-100">
+            <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-zinc-100" data-i18n="hero_title">
                 Hi, I'm yontha.
             </h1>
-            <p class="text-gray-600 dark:text-zinc-400 leading-relaxed text-base sm:text-xl">
+            <p class="text-gray-600 dark:text-zinc-400 leading-relaxed text-base sm:text-xl" data-i18n="hero_desc">
                 I am a student and developer. I have a deep passion for computers and technology, always exploring how things work behind the scenes.
             </p>
         </section>
 
         <!-- Skills Section -->
         <section id="skills" class="space-y-6">
-            <h2 class="text-xl sm:text-2xl font-semibold tracking-tight text-gray-900 dark:text-zinc-100">Skills & Experience</h2>
+            <h2 class="text-xl sm:text-2xl font-semibold tracking-tight text-gray-900 dark:text-zinc-100" data-i18n="skills_title">Skills & Experience</h2>
             <div class="grid gap-4 sm:grid-cols-2">
                 <!-- Linux Card -->
                 <div class="p-5 rounded-2xl border border-gray-100 dark:border-zinc-800/80 bg-gray-50/50 dark:bg-zinc-900/40 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
                     <h3 class="font-semibold text-gray-900 dark:text-zinc-200 mb-2">Linux</h3>
-                    <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
+                    <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed" data-i18n="linux_desc">
                         Mid to advanced level experience. Comfortable working with various distributions, terminal environments, and system configurations.
                     </p>
                 </div>
                 <!-- Python Card -->
                 <div class="p-5 rounded-2xl border border-gray-100 dark:border-zinc-800/80 bg-gray-50/50 dark:bg-zinc-900/40 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
                     <h3 class="font-semibold text-gray-900 dark:text-zinc-200 mb-2">Python</h3>
-                    <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
+                    <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed" data-i18n="python_desc">
                         Basic level knowledge. Capable of writing simple scripts and automating everyday technological tasks.
                     </p>
                 </div>
@@ -100,15 +104,15 @@
 
         <!-- Projects Section -->
         <section id="projects" class="space-y-6">
-            <h2 class="text-xl sm:text-2xl font-semibold tracking-tight text-gray-900 dark:text-zinc-100">Projects</h2>
+            <h2 class="text-xl sm:text-2xl font-semibold tracking-tight text-gray-900 dark:text-zinc-100" data-i18n="projects_title">Projects</h2>
             <div class="grid gap-4">
                 <!-- Dotfiles Card -->
                 <a href="https://github.com/yontha/dotfiles" target="_blank" class="p-5 rounded-2xl border border-gray-100 dark:border-zinc-800/80 bg-gray-50/50 dark:bg-zinc-900/40 hover:border-gray-200 dark:hover:border-zinc-700 transition-all block group">
                     <div class="flex justify-between items-baseline mb-2">
                         <h3 class="font-semibold text-gray-900 dark:text-zinc-200 group-hover:text-black dark:group-hover:text-white transition-colors">dotfiles</h3>
-                        <span class="text-xs text-gray-400 dark:text-zinc-500 font-mono">GitHub Repo</span>
+                        <span class="text-xs text-gray-400 dark:text-zinc-500 font-mono" data-i18n="repo_tag">GitHub Repo</span>
                     </div>
-                    <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
+                    <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed" data-i18n="dotfiles_desc">
                         My personal Linux configuration files, window manager setups, and terminal tool configurations.
                     </p>
                 </a>
@@ -117,9 +121,9 @@
                 <a href="https://github.com/yontha/ytdlp-tools" target="_blank" class="p-5 rounded-2xl border border-gray-100 dark:border-zinc-800/80 bg-gray-50/50 dark:bg-zinc-900/40 hover:border-gray-200 dark:hover:border-zinc-700 transition-all block group">
                     <div class="flex justify-between items-baseline mb-2">
                         <h3 class="font-semibold text-gray-900 dark:text-zinc-200 group-hover:text-black dark:group-hover:text-white transition-colors">ytdlp-tools</h3>
-                        <span class="text-xs text-gray-400 dark:text-zinc-500 font-mono">GitHub Repo</span>
+                        <span class="text-xs text-gray-400 dark:text-zinc-500 font-mono" data-i18n="repo_tag">GitHub Repo</span>
                     </div>
-                    <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
+                    <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed" data-i18n="ytdlp_desc">
                         Terminal-based helper scripts and tools built around yt-dlp for streamlined media streaming and downloading.
                     </p>
                 </a>
@@ -128,15 +132,15 @@
 
         <!-- Contact Section -->
         <section id="contact" class="space-y-4">
-            <h2 class="text-xl sm:text-2xl font-semibold tracking-tight text-gray-900 dark:text-zinc-100">Connect</h2>
-            <p class="text-gray-600 dark:text-zinc-400 leading-relaxed">
+            <h2 class="text-xl sm:text-2xl font-semibold tracking-tight text-gray-900 dark:text-zinc-100" data-i18n="contact_title">Connect</h2>
+            <p class="text-gray-600 dark:text-zinc-400 leading-relaxed" data-i18n="contact_desc">
                 Feel free to check out my GitHub profile or reach out to me directly.
             </p>
             <div class="flex space-x-6 pt-2 text-sm font-medium">
-                <a href="https://github.com/yontha" target="_blank" class="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 underline underline-offset-4 decoration-gray-300 dark:decoration-zinc-700 hover:decoration-gray-900 dark:hover:decoration-zinc-100 transition-all">
+                <a href="https://github.com/yontha" target="_blank" class="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 underline underline-offset-4 decoration-gray-300 dark:decoration-zinc-700 hover:decoration-gray-900 dark:hover:decoration-zinc-100 transition-all" data-i18n="github_link">
                     GitHub Profile
                 </a>
-                <a href="mailto:yontha.egotism147@passinbox.com" class="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 underline underline-offset-4 decoration-gray-300 dark:decoration-zinc-700 hover:decoration-gray-900 dark:hover:decoration-zinc-100 transition-all">
+                <a href="mailto:yontha.egotism147@passinbox.com" class="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 underline underline-offset-4 decoration-gray-300 dark:decoration-zinc-700 hover:decoration-gray-900 dark:hover:decoration-zinc-100 transition-all" data-i18n="email_link">
                     Email
                 </a>
             </div>
@@ -149,10 +153,78 @@
         <span>© 2026 yontha</span>
     </footer>
 
-    <!-- Theme Toggle Script -->
+    <!-- Scripts (Theme & Language Toggle) -->
     <script>
-        const themeToggleBtn = document.getElementById('theme-toggle');
+        // Dil Sözlüğü
+        const translations = {
+            en: {
+                nav_about: "About",
+                nav_skills: "Skills",
+                nav_projects: "Projects",
+                nav_contact: "Contact",
+                hero_title: "Hi, I'm yontha.",
+                hero_desc: "I am a student and developer. I have a deep passion for computers and technology, always exploring how things work behind the scenes.",
+                skills_title: "Skills & Experience",
+                linux_desc: "Mid to advanced level experience. Comfortable working with various distributions, terminal environments, and system configurations.",
+                python_desc: "Basic level knowledge. Capable of writing simple scripts and automating everyday technological tasks.",
+                projects_title: "Projects",
+                repo_tag: "GitHub Repo",
+                dotfiles_desc: "My personal Linux configuration files, window manager setups, and terminal tool configurations.",
+                ytdlp_desc: "Terminal-based helper scripts and tools built around yt-dlp for streamlined media streaming and downloading.",
+                contact_title: "Connect",
+                contact_desc: "Feel free to check out my GitHub profile or reach out to me directly.",
+                github_link: "GitHub Profile",
+                email_link: "Email"
+            },
+            tr: {
+                nav_about: "Hakkımda",
+                nav_skills: "Yetenekler",
+                nav_projects: "Projeler",
+                nav_contact: "İletişim",
+                hero_title: "Merhaba, ben yontha.",
+                hero_desc: "Bir öğrenci ve geliştiriciyim. Bilgisayarlara ve teknolojiye karşı büyük bir tutkum var, her zaman işlerin arka planda nasıl çalıştığını araştırıyorum.",
+                skills_title: "Yetenekler & Deneyim",
+                linux_desc: "Orta ve ileri düzey deneyim. Çeşitli dağıtımlar, uç birim (terminal) ortamları ve sistem yapılandırmaları ile rahatça çalışabiliyorum.",
+                python_desc: "Temel düzeyde bilgi. Basit betikler (script) yazabilir ve günlük teknolojik görevleri otomatik hale getirebilirim.",
+                projects_title: "Projeler",
+                repo_tag: "GitHub Reposu",
+                dotfiles_desc: "Kişisel Linux yapılandırma dosyalarım, pencere yöneticisi (window manager) kurulumlarım ve terminal araç ayarlarım.",
+                ytdlp_desc: "Medya akışı ve indirme işlemlerini kolaylaştırmak için yt-dlp etrafında oluşturulmuş terminal tabanlı yardımcı betikler ve araçlar.",
+                contact_title: "İletişim",
+                contact_desc: "GitHub profilimi incelemekten veya doğrudan bana ulaşmaktan çekinmeyin.",
+                github_link: "GitHub Profili",
+                email_link: "E-posta"
+            }
+        };
 
+        // Dil Değiştirme Mantığı
+        const langToggleBtn = document.getElementById('lang-toggle');
+        let currentLang = localStorage.lang || 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.lang = lang;
+            document.documentElement.lang = lang;
+            langToggleBtn.textContent = lang === 'en' ? 'TR' : 'EN';
+
+            // Metinleri güncelle
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+        }
+
+        // Sayfa yüklendiğinde kayıtlı dili ayarla
+        setLanguage(currentLang);
+
+        langToggleBtn.addEventListener('click', () => {
+            setLanguage(currentLang === 'en' ? 'tr' : 'en');
+        });
+
+        // Tema Değiştirme Mantığı
+        const themeToggleBtn = document.getElementById('theme-toggle');
         themeToggleBtn.addEventListener('click', function() {
             if (document.documentElement.classList.contains('dark')) {
                 document.documentElement.classList.remove('dark');
