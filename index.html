@@ -98,36 +98,41 @@
   .meta { margin-top: 16px; font-size: 12px; color: var(--muted); }
   .meta a { text-underline-offset: 3px; }
 
-  /* 3D moon */
-  .moon-stage {
-    position: relative;
-    height: 320px;
-    display: grid;
-    place-items: center;
-    user-select: none;
+  /* not alanı */
+  .notepad { width: 100%; }
+  .notepad label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .notepad textarea {
+    width: 100%;
+    min-height: 260px;
+    resize: vertical;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 12px;
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.6;
   }
-  .moon-glow {
-    position: absolute;
-    width: 340px;
-    height: 340px;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, rgba(236, 234, 226, .18), transparent 72%);
-    pointer-events: none;
-  }
-  #moon {
-    position: relative;
-    cursor: grab;
-    touch-action: none;
-    display: block;
-  }
-  #moon.dragging { cursor: grabbing; }
-  .moon-hint {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    font-size: 11px;
+  .notepad textarea:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .notepad-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 12px;
     color: var(--muted);
   }
+  .notepad button {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font: inherit;
+    font-size: 12px;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+  .notepad button:hover { background: var(--ink); color: var(--bg); }
 
   /* sections */
   section { border-top: 1px solid var(--line); padding: 44px 0; scroll-margin-top: 16px; }
@@ -201,7 +206,6 @@
   /* responsive */
   @media (max-width: 860px) {
     .hero { grid-template-columns: 1fr; padding: 40px 0 32px; }
-    .moon-stage { height: 280px; }
     .grid3 { grid-template-columns: 1fr 1fr; }
     .tile:nth-child(3n) { border-right: 1px solid var(--line); }
     .tile:nth-child(2n) { border-right: none; }
@@ -254,10 +258,15 @@
       <p class="meta">Sen mi yoksa davan mı yüreksiz? <a href="#iletisim">iletişime geç</a>.</p>
     </div>
 
-    <div class="moon-stage">
-      <div class="moon-glow" aria-hidden="true"></div>
-      <canvas id="moon" role="img" aria-label="döndürülebilen 3 boyutlu ay"></canvas>
-      <p class="moon-hint">sürükleyerek çevir</p>
+    <div class="hero-note">
+      <div class="notepad">
+        <label for="note">buraya bir şey yaz. tarayıcıdan çıkıp girsen de kalır.</label>
+        <textarea id="note" maxlength="2000" placeholder="bir şey yaz…"></textarea>
+        <div class="notepad-foot">
+          <span id="noteStatus">hazır</span>
+          <button type="button" id="noteClear">temizle</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -397,172 +406,43 @@
     render();
   })();
 
-  /* ---------- 3 boyutlu döndürülebilir ay ---------- */
+
+  /* ---------- not alanı (tarayıcıda saklanır) ---------- */
   (function () {
-    var canvas = document.getElementById('moon');
-    var ctx = canvas.getContext('2d');
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var KEY = 'yontha-portfolio-notes';
+    var ta = document.getElementById('note');
+    var st = document.getElementById('noteStatus');
+    var clr = document.getElementById('noteClear');
+    var timer = null;
 
-    var CSS_SIZE = 280;
-    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    var N = Math.round(CSS_SIZE * dpr);
-    canvas.width = N;
-    canvas.height = N;
-    canvas.style.width = CSS_SIZE + 'px';
-    canvas.style.height = CSS_SIZE + 'px';
-
-    var img = ctx.createImageData(N, N);
-    var data = img.data;
-
-    /* yüzey dokusu: eşdikdörtgen (equirectangular) harita */
-    var TW = 512, TH = 256;
-
-    function hash(x, y) {
-      var h = (Math.imul(x, 374761393) + Math.imul(y, 668265263)) | 0;
-      h = Math.imul(h ^ (h >>> 13), 1274126177);
-      h ^= h >>> 16;
-      return (h >>> 0) / 4294967296;
+    try {
+      ta.value = localStorage.getItem(KEY) || '';
+    } catch (e) {
+      st.textContent = 'bu tarayıcıda kayıt kapalı';
     }
-    function vnoise(x, y, p) {
-      var xi = Math.floor(x), yi = Math.floor(y);
-      var fx = x - xi, fy = y - yi;
-      var x0 = ((xi % p) + p) % p, x1 = (x0 + 1) % p;
-      var sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
-      var a = hash(x0, yi), b = hash(x1, yi), c = hash(x0, yi + 1), d = hash(x1, yi + 1);
-      var top = a + (b - a) * sx, bot = c + (d - c) * sx;
-      return top + (bot - top) * sy;
-    }
-    function buildTexture() {
-      var t = new Float32Array(TW * TH);
-      var x, y, o;
-      for (y = 0; y < TH; y++) {
-        for (x = 0; x < TW; x++) {
-          var v = 0, amp = 0.5, per = 4;
-          for (o = 0; o < 5; o++) {
-            v += amp * vnoise(x / TW * per, y / TH * per, per);
-            amp *= 0.5; per *= 2;
-          }
-          t[y * TW + x] = v;
-        }
+
+    function save() {
+      try {
+        localStorage.setItem(KEY, ta.value);
+        st.textContent = 'kaydedildi';
+      } catch (e) {
+        st.textContent = 'kaydedilemedi';
       }
-      /* kraterler */
-      var seed = 7;
-      function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
-      for (var k = 0; k < 260; k++) {
-        var cx = rnd() * TW;
-        var cy = (0.1 + rnd() * 0.8) * TH;
-        var r = 3 + rnd() * rnd() * 28;
-        var y0 = Math.max(0, Math.floor(cy - r * 1.3)), y1 = Math.min(TH - 1, Math.ceil(cy + r * 1.3));
-        for (y = y0; y <= y1; y++) {
-          for (x = Math.floor(cx - r * 1.3); x <= Math.ceil(cx + r * 1.3); x++) {
-            var xx = ((x % TW) + TW) % TW;
-            var dx = xx - cx;
-            if (dx > TW / 2) dx -= TW;
-            if (dx < -TW / 2) dx += TW;
-            var d = Math.sqrt(dx * dx + (y - cy) * (y - cy)) / r;
-            var i = y * TW + xx;
-            if (d < 1) t[i] -= 0.14 * (1 - d);
-            else if (d < 1.25) t[i] += 0.07 * (1.25 - d) / 0.25;
-          }
-        }
-      }
-      var mn = Infinity, mx = -Infinity;
-      for (var j = 0; j < t.length; j++) { if (t[j] < mn) mn = t[j]; if (t[j] > mx) mx = t[j]; }
-      for (j = 0; j < t.length; j++) t[j] = (t[j] - mn) / (mx - mn);
-      return t;
-    }
-    var tex = buildTexture();
-
-    /* ışık: sol üstten */
-    var L = [-0.45, 0.55, 0.7];
-    var len = Math.sqrt(L[0] * L[0] + L[1] * L[1] + L[2] * L[2]);
-    L = [L[0] / len, L[1] / len, L[2] / len];
-
-    var yaw = 0.4, pitch = 0.25;
-    var vYaw = 0, vPitch = 0;
-    var dragging = false, lastX = 0, lastY = 0;
-
-    function draw() {
-      var ca = Math.cos(pitch), sa = -Math.sin(pitch);   /* ters X dönüşü */
-      var cb = Math.cos(yaw), sb = -Math.sin(yaw);       /* ters Y dönüşü */
-      var R = N / 2 * 0.94, c = N / 2;
-
-      for (var py = 0; py < N; py++) {
-        var ny = -((py + 0.5) - c) / R;
-        for (var px = 0; px < N; px++) {
-          var nx = ((px + 0.5) - c) / R;
-          var r2 = nx * nx + ny * ny;
-          var idx = (py * N + px) * 4;
-          if (r2 > 1) { data[idx + 3] = 0; continue; }
-          var nz = Math.sqrt(1 - r2);
-
-          var y1 = ny * ca - nz * sa;
-          var z1 = ny * sa + nz * ca;
-          var x2 = nx * cb + z1 * sb;
-          var z2 = -nx * sb + z1 * cb;
-          var y2 = y1;
-
-          var lon = Math.atan2(x2, z2);
-          var lat = Math.asin(Math.max(-1, Math.min(1, y2)));
-          var u = ((lon / (2 * Math.PI)) + 0.5) * TW;
-          var v = (0.5 - lat / Math.PI) * TH;
-          var iu = Math.floor(u) % TW;
-          if (iu < 0) iu += TW;
-          var iv = Math.min(TH - 1, Math.max(0, Math.floor(v)));
-
-          var g = tex[iv * TW + iu];
-          var lit = nx * L[0] + ny * L[1] + nz * L[2];
-          var shade = 0.08 + 0.92 * Math.max(0, lit);
-          var val = (0.6 + 0.4 * g) * shade;
-
-          data[idx]     = 238 * val;
-          data[idx + 1] = 236 * val;
-          data[idx + 2] = 228 * val;
-          data[idx + 3] = 255;
-        }
-      }
-      ctx.putImageData(img, 0, 0);
     }
 
-    function loop() {
-      if (!dragging) {
-        if (!reduce) yaw += 0.003;
-        yaw += vYaw;
-        pitch += vPitch;
-        vYaw *= 0.94;
-        vPitch *= 0.94;
-      }
-      if (pitch > 1.2) pitch = 1.2;
-      if (pitch < -1.2) pitch = -1.2;
-      draw();
-      requestAnimationFrame(loop);
-    }
-
-    canvas.addEventListener('pointerdown', function (e) {
-      dragging = true;
-      lastX = e.clientX; lastY = e.clientY;
-      vYaw = 0; vPitch = 0;
-      canvas.classList.add('dragging');
-      canvas.setPointerCapture(e.pointerId);
+    ta.addEventListener('input', function () {
+      st.textContent = 'kaydediliyor…';
+      clearTimeout(timer);
+      timer = setTimeout(save, 400);
     });
-    canvas.addEventListener('pointermove', function (e) {
-      if (!dragging) return;
-      var dx = (e.clientX - lastX) * 0.008;
-      var dy = (e.clientY - lastY) * 0.008;
-      yaw += dx;
-      pitch += dy;
-      vYaw = dx;
-      vPitch = dy;
-      lastX = e.clientX; lastY = e.clientY;
-    });
-    function endDrag() {
-      dragging = false;
-      canvas.classList.remove('dragging');
-    }
-    canvas.addEventListener('pointerup', endDrag);
-    canvas.addEventListener('pointercancel', endDrag);
 
-    loop();
+    clr.addEventListener('click', function () {
+      if (!ta.value) return;
+      if (!window.confirm('yazdığın not silinsin mi?')) return;
+      ta.value = '';
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      st.textContent = 'temizlendi';
+    });
   })();
 </script>
 
